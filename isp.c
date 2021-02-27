@@ -17,6 +17,9 @@
 int FDS_ARRAY_1[MAX_PIPE_COUNT][2]; // Stores the file descriptors of all unnamed pipes opened
 int FDS_ARRAY_2[MAX_PIPE_COUNT][2]; // Stores the file descriptors of all unnamed pipes opened
 int pipec = 0;
+int statistics_char_count = 0;
+int statistics_read_count = 0;
+int statistics_write_count = 0;
 
 /* PROTOTYPES */
 void tokenizeString(char str[500], int *argNo, char *args[]);
@@ -125,24 +128,33 @@ void runChildProcess(char *cmd, int pipeRead, int pipeWrite, int readFd[2], int 
 void moveData(int fd[2], int fd2[2], int N){
     int bytesRead = 1;
     char buf[N]; /* Parent process’s message buffer */
+    statistics_char_count = 0;
+    statistics_read_count = 0;
+    statistics_write_count = 0;
 
     while (bytesRead)
     {
         // read N bytes from fd
-        bytesRead = read ( fd[READ], buf, N);
+        if ((bytesRead = read ( fd[READ], buf, N)) == -1){
+            fprintf(stderr, "Failed reading from pipe\n");
+            // exit(1);
+        } else {
+            statistics_char_count += bytesRead;
+            statistics_read_count += 1;
+        }
 
-        printf(".\n");
-        
+        // write N bytes to fd2
+        if (write (fd2[WRITE], buf, bytesRead) == - 1){
+            fprintf(stderr, "Failed writing to pipe\n");
+            // exit(1);
+        } else {
+            statistics_write_count += 1;
+        }
+
         if (bytesRead == 0){
             close(fd2[WRITE]);
-            close(fd[READ]);            
-        } else {
-            // write N bytes to fd2
-            if (write (fd2[WRITE], buf, N) == - 1){
-                fprintf(stderr, "Failed writing to pipe\n");
-                // exit(1);
-            }
-        }
+            close(fd[READ]);
+        } 
     }
 }
 
@@ -234,6 +246,14 @@ int main(int argc, char *argv[])
 
         for (int i = 0; i < cmdsc; i ++){
             wait(NULL);
+        }
+
+        if (mode == 2 && cmdsc > 1){
+            // Printing statistics
+            printf("============ STATISTICS ============\n");
+            printf("character-count: %d\n", statistics_char_count);
+            printf("read-call-count: %d\n", statistics_read_count);
+            printf("write-call-count: %d\n", statistics_write_count);
         }
     }
 }

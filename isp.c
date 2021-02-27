@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/time.h>
 
 /* CONSTANTS */
 #define PIPE_CHAR '|'
@@ -82,7 +83,7 @@ void parseInput(int argNo, char *args[], char cmds[][50], int *cmdsc){
  */
 void runChildProcess(char *cmd, int pipeRead, int pipeWrite, int readFd[2], int writeFd[2]){
     pid_t pid;
-    int status;
+    // int status;
 
     pid = fork ();
 
@@ -210,6 +211,12 @@ int main(int argc, char *argv[])
         tokenizeString(str, &argsNo, args);
         parseInput(argsNo, args, cmds, &cmdsc);
 
+        // Start calculating time
+        struct timeval timeBefore;
+        struct timeval timeAfter;
+
+        gettimeofday(&timeBefore, NULL);
+
         for (int i = 0; i < cmdsc; i++){
             if (cmdsc == 1){ // There is only one process, no pipe is needed
                 runChildProcess(cmds[i], FALSE, FALSE, NULL, NULL);
@@ -248,9 +255,13 @@ int main(int argc, char *argv[])
             wait(NULL);
         }
 
+        printf("============ STATISTICS ============\n");
+        
+        gettimeofday(&timeAfter, NULL);
+        printf("Execution time in micro seconds : %ld\n", (timeAfter.tv_usec - timeBefore.tv_usec));
+
         if (mode == 2 && cmdsc > 1){
             // Printing statistics
-            printf("============ STATISTICS ============\n");
             printf("character-count: %d\n", statistics_char_count);
             printf("read-call-count: %d\n", statistics_read_count);
             printf("write-call-count: %d\n", statistics_write_count);

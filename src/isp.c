@@ -274,7 +274,7 @@ int main(int argc, char *argv[])
         printf("\n============ STATISTICS ============\n");
         
         gettimeofday(&timeAfter, NULL);
-        printf("Execution time: %ld s, %ld ms\n", (timeAfter.tv_sec - timeBefore.tv_sec),(timeAfter.tv_usec - timeBefore.tv_usec));
+        printf("Execution time: %ld ms\n", ((timeAfter.tv_sec * 60000) + timeAfter.tv_usec - (timeBefore.tv_sec * 60000) + timeBefore.tv_usec));
 
         if (mode == 2 && cmdsc > 1){
             // Printing statistics

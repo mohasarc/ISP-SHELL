@@ -1,9 +1,10 @@
-./producer 10 | ./consumer 10
-./producer 100 | ./consumer 100
-./producer 1000 | ./consumer 1000
-./producer 10000 | ./consumer 10000
-./producer 100000 | ./consumer 100000
-./producer 1000000 | ./consumer 1000000
-./producer 10000000 | ./consumer 10000000
-./producer 100000000 | ./consumer 100000000
+../producer 100000000 | ../consumer 100000000
+../producer 200000000 | ../consumer 200000000
+../producer 300000000 | ../consumer 300000000
+../producer 400000000 | ../consumer 400000000
+../producer 500000000 | ../consumer 500000000
+../producer 600000000 | ../consumer 600000000
+../producer 700000000 | ../consumer 700000000
+../producer 800000000 | ../consumer 800000000
+../producer 900000000 | ../consumer 900000000
 0

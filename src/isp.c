@@ -188,6 +188,7 @@ void createPipes(int **fd1, int **fd2, int mode){
 
 /* THE MAIN CODE 
     USAGE: ./isp N mode ReadStdinFromFile? fileName?
+    Note: The program is designed to read and pipeline n programs.
 */
 int main(int argc, char *argv[])
 {  

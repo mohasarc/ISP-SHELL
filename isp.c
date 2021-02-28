@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/time.h>
+#include<fcntl.h> 
 
 /* CONSTANTS */
 #define PIPE_CHAR '|'
@@ -185,7 +186,9 @@ void createPipes(int **fd1, int **fd2, int mode){
     pipec++;
 }
 
-/* THE MAIN CODE */
+/* THE MAIN CODE 
+    USAGE: ./isp N mode ReadStdinFromFile? fileName?
+*/
 int main(int argc, char *argv[])
 {  
     int N = 0, mode = 0;
@@ -193,6 +196,11 @@ int main(int argc, char *argv[])
     if (argc == 3) {
         N = atoi(argv[1]);
         mode = atoi(argv[2]);
+    }
+
+    if (argc == 5 && atoi(argv[3])){
+        int fd = open(argv[4], O_RDONLY | O_CREAT);
+        dup2(fd, STDIN_FILENO);
     }
 
     while (1) {
@@ -208,6 +216,14 @@ int main(int argc, char *argv[])
 
         printf("isp$ ");
         scanf(" %[^\n]", str);
+
+        if (strcmp(str, "0") == 0 && argc > 3 && atoi(argv[3])) // The end of the input filez
+            break;
+
+        if (argc > 3 && atoi(argv[3])){
+            printf("%s\n", str);
+        }
+    
         tokenizeString(str, &argsNo, args);
         parseInput(argsNo, args, cmds, &cmdsc);
 
@@ -255,10 +271,10 @@ int main(int argc, char *argv[])
             wait(NULL);
         }
 
-        printf("============ STATISTICS ============\n");
+        printf("\n============ STATISTICS ============\n");
         
         gettimeofday(&timeAfter, NULL);
-        printf("Execution time in micro seconds : %ld\n", (timeAfter.tv_usec - timeBefore.tv_usec));
+        printf("Execution time: %ld s, %ld ms\n", (timeAfter.tv_sec - timeBefore.tv_sec),(timeAfter.tv_usec - timeBefore.tv_usec));
 
         if (mode == 2 && cmdsc > 1){
             // Printing statistics
@@ -266,5 +282,7 @@ int main(int argc, char *argv[])
             printf("read-call-count: %d\n", statistics_read_count);
             printf("write-call-count: %d\n", statistics_write_count);
         }
+
+        printf("\n");
     }
 }
